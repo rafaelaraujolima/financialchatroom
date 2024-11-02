@@ -1,0 +1,73 @@
+# Logs
+logs
+*.log
+*.tlog
+
+# Compiled source
+bin/
+obj/
+
+# Visual Studio 2019/2022 directory
+.vscode/
+.vs/
+.vscode/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Mono auto generated files
+mono_crash.*
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# DotNet Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Environment variables
+.env
+.env.*
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# IIS
+_IISExpress/
+.vscode/
+.publish/
+
+# Database
+*.mdf
+*.ldf
+
+# Entity Framework
+Migrations/
+
+# Azure
+.localhistory
+.publish_profiles/
+
+# Npm
+node_modules/
+
+# Yarn
+.yarn/
+.pnp.*
+
+# Others
+*.pdf
+*.docx
+*.http
