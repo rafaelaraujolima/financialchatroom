@@ -13,11 +13,12 @@ namespace FinancialChatRoom.Hubs
                 {
                     if (IsValidCommand(message))
                     {
-                        
+                        string returnMessage = await FinancialControlBot.GetStockQuote(StockName(message));
+                        await Clients.Caller.SendAsync("ReceiveMessage", "BOT", returnMessage);
                     }
                     else
                     {
-                        await Clients.Caller.SendAsync("ReceiveMessage", "System", $"The command you entered is not a valid command! Command: {message}");
+                        await Clients.Caller.SendAsync("ReceiveMessage", "SYSTEM", $"The command you entered is not a valid command! Command: {message}");
                     }
                 }
                 else
@@ -49,6 +50,11 @@ namespace FinancialChatRoom.Hubs
             string command = message.Substring(1, indexOfEndOfCommand - 1);
 
             return Commands.validCommands.Contains(command);
+        }
+
+        private static string StockName(string command)
+        {
+            return command.Substring(command.IndexOf(Commands.commandPatternEnd) + 1);
         }
     }
 }
