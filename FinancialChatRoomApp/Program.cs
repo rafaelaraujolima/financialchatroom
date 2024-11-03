@@ -1,3 +1,5 @@
+using FinancialChatRoom.Hubs;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -22,5 +24,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapRazorPages();
+// Maps the endpoint for the chatroom
+app.MapHub<FinancialChatRoomHub>("/chatroomhub");
 
 app.Run();
