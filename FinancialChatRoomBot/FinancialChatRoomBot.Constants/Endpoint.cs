@@ -1,4 +1,4 @@
-﻿namespace FinancialChatRoomBot.Constants
+﻿namespace FinancialChatRoomBot.FinancialChatRoomBot.Constants
 {
     public static class Endpoint
     {

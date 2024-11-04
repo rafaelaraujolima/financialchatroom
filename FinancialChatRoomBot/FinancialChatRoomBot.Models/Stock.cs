@@ -1,4 +1,4 @@
-﻿namespace FinancialChatRoomBot.Models
+﻿namespace FinancialChatRoomBot.FinancialChatRoomBot.Models
 {
     public class Stock
     {

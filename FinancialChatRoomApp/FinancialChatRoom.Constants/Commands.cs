@@ -1,4 +1,4 @@
-﻿namespace Constants
+﻿namespace FinancialChatRoom.Constants
 {
     public static class Commands
     {
