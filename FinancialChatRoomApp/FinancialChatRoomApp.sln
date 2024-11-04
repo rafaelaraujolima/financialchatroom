@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinancialChatRoomApp", "FinancialChatRoomApp.csproj", "{C6DAB5BB-DE64-458E-BD13-F463AFAB4D83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinancialChatRoomBotService", "..\FinancialChatRoomBotService\FinancialChatRoomBotService.csproj", "{42C7B559-7721-40D0-9244-4E15AD4CC36D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinancialChatRoomBotService", "..\FinancialChatRoomBotService\FinancialChatRoomBotService.csproj", "{42C7B559-7721-40D0-9244-4E15AD4CC36D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

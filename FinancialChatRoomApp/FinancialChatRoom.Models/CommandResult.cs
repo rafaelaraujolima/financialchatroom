@@ -1,4 +1,6 @@
-﻿namespace FinancialChatRoomApp.FinancialChatRoom.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace FinancialChatRoomApp.FinancialChatRoom.Models
 {
     public class CommandResult
     {

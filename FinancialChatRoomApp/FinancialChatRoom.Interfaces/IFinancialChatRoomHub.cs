@@ -2,7 +2,7 @@
 {
     public interface IFinancialChatRoomHub
     {
-        Task SendMessage(string user, string message);
+        Task SendMessageAsync(string user, string message);
         Task ReceiveCommandResult(string jsonMessage);
     }
 }

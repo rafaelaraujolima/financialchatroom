@@ -84,9 +84,9 @@ namespace FinancialChatRoomBotService.FinancialChatRoomBot.Services
                     DateOfQuote = DateOnly.ParseExact(columns[1], "yyyy-MM-dd", CultureInfo.InvariantCulture),
                     TimeOfQuote = TimeOnly.ParseExact(columns[2], "HH:mm:ss", CultureInfo.InvariantCulture),
                     OpenQuote = Double.Parse(columns[3], CultureInfo.InvariantCulture),
-                    HighQuote = Double.Parse(columns[4]),
-                    LowQuote = Double.Parse(columns[5]),
-                    CloseQuote = Double.Parse(columns[6]),
+                    HighQuote = Double.Parse(columns[4], CultureInfo.InvariantCulture),
+                    LowQuote = Double.Parse(columns[5], CultureInfo.InvariantCulture),
+                    CloseQuote = Double.Parse(columns[6], CultureInfo.InvariantCulture),
                     VolumeOfNegotiations = Int32.Parse(columns[7])
                 };
 
@@ -100,7 +100,7 @@ namespace FinancialChatRoomBotService.FinancialChatRoomBot.Services
 
             stringBuilder.Append(stock.Name.ToUpper());
             stringBuilder.Append(" quote is $");
-            stringBuilder.Append(stock.OpenQuote.ToString("F2", CultureInfo.InvariantCulture));
+            stringBuilder.Append(stock.CloseQuote.ToString("F2", CultureInfo.InvariantCulture));
             stringBuilder.Append(" per share");
 
             return stringBuilder.ToString();

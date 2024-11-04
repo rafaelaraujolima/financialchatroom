@@ -1,28 +1,34 @@
 ﻿using FinancialChatRoom.Constants;
+using FinancialChatRoomApp.FinancialChatRoom.Configuration;
 using FinancialChatRoomApp.FinancialChatRoom.Interfaces;
+using FinancialChatRoomApp.FinancialChatRoom.Interfaces.Repositories;
 using FinancialChatRoomApp.FinancialChatRoom.Models;
-using FinancialChatRoomApp.FinancialChatRoom.Services;
+using FinancialChatRoomApp.Models;
 using Microsoft.AspNetCore.SignalR;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System.Text;
 using System.Text.Json;
 
 namespace FinancialChatRoom.Hubs
 {
     public class FinancialChatRoomHub : Hub, IFinancialChatRoomHub
     {
-        private readonly RabbitMQService _rabbitMQService;
+        private readonly IModel _model;
         private readonly ILogger<FinancialChatRoomHub> _logger;
+        private readonly IServiceProvider _serviceProvider;
 
-        public FinancialChatRoomHub(RabbitMQService service,
-            ILogger<FinancialChatRoomHub> logger)
+        public FinancialChatRoomHub(RabbitMQConnection rbConnection,
+            ILogger<FinancialChatRoomHub> logger,
+            IServiceProvider serviceProvider)
         {
-            _rabbitMQService = service;
+            _model = rbConnection.GetModel();
             _logger = logger;
+            _serviceProvider = serviceProvider;
         }
 
-        public async Task SendMessage(string user, string message)
-        {
-            var username = Context.User?.Identity?.Name;
-            
+        public async Task SendMessageAsync(string user, string message)
+        {         
             if (IsValidMessage(message))
             {
                 if (IsCommand(message))
@@ -35,7 +41,7 @@ namespace FinancialChatRoom.Hubs
                             StockName = StockName(message)
                         });
 
-                        _rabbitMQService.SendMessage(jsonMessage);
+                        SendMessage(jsonMessage);
                     }
                     else
                     {
@@ -44,8 +50,22 @@ namespace FinancialChatRoom.Hubs
                 }
                 else
                 {
+                    Post post = new Post
+                    {
+                        DateOfPost = DateTime.UtcNow,
+                        Message = message,
+                        UserName = user
+                    };
+
                     // Send messages to the clients logged in the chatroom
-                    await Clients.All.SendAsync("ReceiveMessage", user, message);
+                    await Clients.All.SendAsync("ReceiveMessage", post.UserName, post.Message, post.DateOfPost.ToString());
+
+                    using (var scope = _serviceProvider.CreateScope())
+                    {
+                        var postRepository = scope.ServiceProvider.GetRequiredService<IPostRepository>();
+
+                        await postRepository.InsertPostAsync(post);
+                    }
                 }
             }
         }
@@ -83,6 +103,46 @@ namespace FinancialChatRoom.Hubs
         private static string StockName(string command)
         {
             return command.Substring(command.IndexOf(Commands.commandPatternEnd) + 1);
+        }
+
+        public void SendMessage(string jsonMessage)
+        {
+            var body = Encoding.UTF8.GetBytes(jsonMessage);
+            _model.BasicPublish(exchange: "",
+                                routingKey: "CommandToBotQueue",
+                                basicProperties: null,
+                                body: body);
+            _logger.LogInformation($"RabbitMQ: Sent {jsonMessage.ToString()}");
+        }
+
+        public void ReceiveMessages()
+        {
+            var consumer = new EventingBasicConsumer(_model);
+
+            consumer.Received += (model, ea) =>
+            {
+                var body = ea.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
+
+                _ = Task.Run(async () =>
+                {
+                    await ProcessReceivedMessage(message);
+                });
+
+                _logger.LogInformation($"RabbitMQ-App: Received {message}");
+            };
+
+            _model.BasicConsume(queue: "ResponseFromBotQueue",
+                                 autoAck: true,
+                                 consumer: consumer);
+        }
+
+        private async Task ProcessReceivedMessage(string message)
+        {
+            var commandResult = JsonSerializer.Deserialize<CommandResult>(message);
+            
+            //precisa configurar a autenticação
+            await Clients.Caller.SendAsync("ReceiveMessage", "BOT", commandResult.Message, DateTime.UtcNow);
         }
     }
 }
