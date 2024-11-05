@@ -15,6 +15,7 @@ namespace FinancialChatRoomApp.FinancialChatRoom.Configuration
             var factory = new ConnectionFactory()
             {
                 HostName = rabbitMQSettings.Value.HostName,
+                Port = rabbitMQSettings.Value.Port,
                 UserName = rabbitMQSettings.Value.UserName,
                 Password = rabbitMQSettings.Value.Password
             };
