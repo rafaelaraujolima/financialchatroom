@@ -38,11 +38,24 @@ namespace FinancialChatRoomBotService.FinancialChatRoomBot.Services
 
                     Stock stock = StockQuoteCsvToStock(csvContent);
 
-                    string responseMessage = JsonSerializer.Serialize(new ResponseMessage
+                    string responseMessage = string.Empty;
+
+                    if (stock != null)
                     {
-                        Caller = message.Caller,
-                        Message = StockQuoteMessage(stock)
-                    });
+                        responseMessage = JsonSerializer.Serialize(new ResponseMessage
+                        {
+                            Caller = message.Caller,
+                            Message = StockQuoteMessage(stock)
+                        });
+                    }
+                    else
+                    {
+                        responseMessage = JsonSerializer.Serialize(new ResponseMessage
+                        {
+                            Caller = message.Caller,
+                            Message = StockNotFoundMessage(message.StockName.ToUpper())
+                        });
+                    }
 
                     _rabbitMQService.SendMessage(responseMessage);
                 }
@@ -57,7 +70,7 @@ namespace FinancialChatRoomBotService.FinancialChatRoomBot.Services
             }
         }
 
-        private static Stock StockQuoteCsvToStock(string csvContent)
+        private static Stock? StockQuoteCsvToStock(string csvContent)
         {
             using (var reader = new StringReader(csvContent))
             {
@@ -74,23 +87,30 @@ namespace FinancialChatRoomBotService.FinancialChatRoomBot.Services
 
                 var columns = line.Split(',');
 
-                // need to validate data before instantiating
-                // after a period the market is closed
-                // and the response could be different
-                // need to handle this
-                Stock stock = new Stock
+                if (DateOnly.TryParseExact(columns[1], "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly dateOfQuote) &&
+                    TimeOnly.TryParseExact(columns[2], "HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out TimeOnly timeOfQuote) &&
+                    Double.TryParse(columns[3], NumberStyles.Any, CultureInfo.InvariantCulture, out double openQuote) &&
+                    Double.TryParse(columns[4], NumberStyles.Any, CultureInfo.InvariantCulture, out double highQuote) &&
+                    Double.TryParse(columns[5], NumberStyles.Any, CultureInfo.InvariantCulture, out double lowQuote) &&
+                    Double.TryParse(columns[6], NumberStyles.Any, CultureInfo.InvariantCulture, out double closeQuote) &&
+                    Int32.TryParse(columns[7], out int volume))
                 {
-                    Name = columns[0],
-                    DateOfQuote = DateOnly.ParseExact(columns[1], "yyyy-MM-dd", CultureInfo.InvariantCulture),
-                    TimeOfQuote = TimeOnly.ParseExact(columns[2], "HH:mm:ss", CultureInfo.InvariantCulture),
-                    OpenQuote = Double.Parse(columns[3], CultureInfo.InvariantCulture),
-                    HighQuote = Double.Parse(columns[4], CultureInfo.InvariantCulture),
-                    LowQuote = Double.Parse(columns[5], CultureInfo.InvariantCulture),
-                    CloseQuote = Double.Parse(columns[6], CultureInfo.InvariantCulture),
-                    VolumeOfNegotiations = Int32.Parse(columns[7])
-                };
+                    Stock stock = new Stock
+                    {
+                        Name = columns[0],
+                        DateOfQuote = dateOfQuote,
+                        TimeOfQuote = timeOfQuote,
+                        OpenQuote = openQuote,
+                        HighQuote = highQuote,
+                        LowQuote = lowQuote,
+                        CloseQuote = closeQuote,
+                        VolumeOfNegotiations = volume
+                    };
 
-                return stock;
+                    return stock;
+                }
+
+                return null;
             }
         }
 
@@ -104,6 +124,11 @@ namespace FinancialChatRoomBotService.FinancialChatRoomBot.Services
             stringBuilder.Append(" per share");
 
             return stringBuilder.ToString();
+        }
+
+        private static string StockNotFoundMessage(string stockName)
+        {
+            return "Stock " + stockName + " not found";
         }
     }
 }
