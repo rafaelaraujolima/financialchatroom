@@ -142,7 +142,7 @@ namespace FinancialChatRoom.Hubs
             var commandResult = JsonSerializer.Deserialize<CommandResult>(message);
             
             //precisa configurar a autenticação
-            await Clients.Caller.SendAsync("ReceiveMessage", "BOT", commandResult.Message, DateTime.UtcNow);
+            await Clients.Caller.SendAsync("ReceiveMessage", "BOT", commandResult.Message, DateTime.UtcNow.ToString());
         }
     }
 }

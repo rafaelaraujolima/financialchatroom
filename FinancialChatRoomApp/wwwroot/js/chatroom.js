@@ -5,6 +5,8 @@ let connection = new signalR.HubConnectionBuilder().withUrl("/chatroomhub").buil
 //Disable the send button until connection is established.
 document.getElementById("sendButton").disabled = true;
 
+const messages = [];
+
 connection.on("ReceiveMessage", function (user, message, dateTime) {
     const utcDate = new Date(dateTime);
 
@@ -15,10 +17,32 @@ connection.on("ReceiveMessage", function (user, message, dateTime) {
         hour: '2-digit', minute: '2-digit', second: '2-digit'
     });
 
-    let li = document.createElement("li");
-    document.getElementById("messagesList").appendChild(li);
-    li.textContent = `${user}: ${message} - ${localDateTime}`;
+    messages.push({ user, message, localDateTime });
+    messages.sort((t1, t2) => new Date(t2.localDateTime) - new Date(t1.localDateTime));
+
+    if (messages.length > 50) {
+        messages.pop();
+    }
+
+    displayMessages();
+
+    //let li = document.createElement("li");
+    //document.getElementById("messagesList").appendChild(li);
+    //li.textContent = `${user}: ${message} - ${localDateTime}`;
 });
+
+function displayMessages() {
+    const messagesList = document.getElementById("messagesList");
+    messagesList.innerHTML = ''; // Clear the existing list
+
+    // Display each message in order
+    messages.forEach(message => {
+        const li = document.createElement("li");
+        li.textContent = `${message.user}: ${message.message} - ${message.localDateTime}`;
+        messagesList.appendChild(li);
+    });
+
+}
 
 connection.start().then(function () {
     document.getElementById("sendButton").disabled = false;
