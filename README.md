@@ -78,3 +78,11 @@ I didn’t have time to set up a `docker-compose`, so open two terminals (Window
 Both will run, and the application can be accessed via the browser at the address `http://localhost:5220`.
 
 You can open multiple tabs, each independent of the other.
+
+## Endpoints to interact:
+
+Home: `http://localhost:5220`
+
+Login: `http://localhost:5220/Account/Login`
+
+Register a User: `http://localhost:5220/Account/Register`
