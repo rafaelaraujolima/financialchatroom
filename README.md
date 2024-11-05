@@ -35,7 +35,13 @@ This will download the image and run the MySQL container. If you already have My
 > docker run --name mysqlserver -e MYSQL_ROOT_PASSWORD=YOUR_PASSWORD -p 9999:3306 -d mysql:8.0
 ```
 
-Don’t forget to change the connection port in the appsettings.json file located in the project directory at financialchatroom\FinancialChatRoomApp.
+Clone the project to your computer with
+
+```bash
+> git clone https://github.com/rafaelaraujolima/financialchatroom.git
+```
+
+Don’t forget to change the connection port in the `appsettings.json` file located in the project directory at `financialchatroom\FinancialChatRoomApp`.
 
 ```json
 appsettings.json
@@ -45,9 +51,9 @@ appsettings.json
 }
 ```
 
-Replace the values of DATABASE_USERNAME and YOUR_PASSWORD with your own values. The YOUR_PASSWORD is the same as the one used in the MySQL installation command.
+Replace the values of `DATABASE_USERNAME` and `YOUR_PASSWORD` with your own values. The `YOUR_PASSWORD` is the same as the one used in the MySQL installation command.
 
-Run the migrations to create and structure the database. Inside the project folder financialchatroom\FinancialChatRoomApp, execute the following commands.
+Run the migrations to create and structure the database. Inside the project folder `financialchatroom\FinancialChatRoomApp`, execute the following commands.
 
 ```bash
 # install entity framework executable
